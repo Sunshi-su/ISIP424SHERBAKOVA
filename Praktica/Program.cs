@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -16,7 +16,12 @@ namespace Praktica
             //проверка каут если нет то в экзист записать фалсе
             //category name!!
             List<Product> products = new List<Product>();
-            CategoryName categoryName;
+            products.Add(new Product("пельмени", 100, 10, CategoryName.Еда));
+            products.Add(new Product("ручка", 50, 30, CategoryName.Концелярия));
+            products.Add(new Product("карандаш", 30, 123, CategoryName.Концелярия));
+            products.Add(new Product("MacBook Neo", 100000, 5, CategoryName.Техника));
+            products.Add(new Product("мышка", 1500, 67, CategoryName.Техника));
+            CategoryName categoryName = CategoryName.Еда;
 
             bool k = true;
             while (k)
@@ -43,40 +48,54 @@ namespace Praktica
                         Console.WriteLine("1. Еда"); //
                         Console.WriteLine("2. Техника ");//
                         Console.WriteLine("3. Быт");
-
-                        int n = Convert.ToInt32(Console.ReadLine());
-                        switch (n)
+                        bool validInput = true;
+                        while (validInput)
                         {
-                            case 1:
-                                categoryName = CategoryName.Еда;
-                                break;
-                            case 2:
-                                categoryName = CategoryName.Техника;
-                                break;
-                            case 3:
+                            int n = Convert.ToInt32(Console.ReadLine());
+                            switch (n)
+                            {
+                                case 1:
+                                    categoryName = CategoryName.Еда;
+                                    break;
+                                case 2:
+                                    categoryName = CategoryName.Техника;
+                                    break;
+                                case 3:
+                                    categoryName = CategoryName.Быт;
+                                    break;
+                                default:
+                                    Console.WriteLine("Неверный выбор");
+                                    validInput = false;
+                                    break;
+                            }
+                            Console.WriteLine("Введите  название товара");
+                            string productName = Console.ReadLine();
+                            Console.WriteLine("Введите  цену за единицу товара");
+                            double productPrice = Convert.ToDouble(Console.ReadLine());
+                            Console.WriteLine("Введите количество в наличии");
+                            int productCount = Convert.ToInt32(Console.ReadLine());
 
-                                break;
-                            default:
-                                Console.WriteLine("Неверный выбор");
-                                break;
+                            Product h = new Product(productName, productPrice, productCount, categoryName);
+                            //h добавляем в лист продукт
                         }
-                        Product h = new Product(,categoryName);
-                        //h добавляем в лист продукт
+
+
+
                         break;
                     case 2:
 
                         break;
                     case 3:
 
-                        
+
 
                     case 4:
 
-                       
-                        
+
+
                         break;
                     case 5:
-                        
+
                         break;
 
                     default:
@@ -85,7 +104,7 @@ namespace Praktica
 
                 }
             }
-        } 
+        }
 
         class Product
         {
@@ -100,18 +119,40 @@ namespace Praktica
 
             public CategoryName Category;
 
-            public Product (string  Name, double Price, int Count, bool Exist, CategoryName category)
+            public Product(string Name, double Price, int Count, CategoryName category)
             {
                 this.Name = Name;
-                this.Price = Price; 
+                this.Price = Price;
                 this.Count = Count;
-                this.Exist = Exist;
+                if (Count <= 0)
+                {
+                    this.Exist = false;
+                }
+                else
+                {
+                    this.Exist = true;
+                }
                 Category = category;
             }
 
-            public bool Sklad(Count)
+            public bool Search(int  Count)
             {
-                return true;
+                if (Count <= 0)
+                {
+                    return false;
+                }
+                else if (Count > 0)
+                {
+
+                    return true;
+                }
+                else
+                {
+                    this.Count -= Count;
+                    Console.WriteLine($"Продано {Count} единиц товара {Name}. Остаток на складе: {this.Count}");
+                    return true;
+                }
+                
             }
         }
 
@@ -120,6 +161,7 @@ namespace Praktica
             Еда,
             Техника,
             Быт,
+            Концелярия
 
         }
 
