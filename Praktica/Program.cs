@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
 
 namespace Praktica
 {
@@ -15,523 +15,206 @@ namespace Praktica
     {
         static void Main(string[] args)
         {
-            //проверка каут если нет то в экзист записать фалсе
-            //category name!!
-            List<Product> products = new List<Product>();
-            products.Add(new Product("пельмени", 100, 10, CategoryName.Еда));
-            products.Add(new Product("Штангерциркуль", 50, 30, CategoryName.Концелярия));
-            products.Add(new Product("карандаш", 30, 123, CategoryName.Концелярия));
-            products.Add(new Product("MacBook Neo", 123000, 5, CategoryName.Техника));
-            products.Add(new Product("мышка", 1500, 67, CategoryName.Техника));
-            CategoryName categoryName = CategoryName.Еда;
+            
             
             bool k = true;
             while (k)
             {
                 Console.WriteLine("-----------------------------------");
-                Console.WriteLine("Выберите что хотите сделать:");
+                Console.WriteLine("Выберите действие:");
+                Console.WriteLine("1. Ввести текст и показать статистику");
+                Console.WriteLine("2. Показать статистику прошлых текстов");
+                Console.WriteLine("0. Выход");
 
-                Console.WriteLine("1. Добавить товар"); //
-                Console.WriteLine("2. Удалить товар");//
-                Console.WriteLine("3. Заказать поставку товара");
-                Console.WriteLine("4. Продать товар ");//
-                Console.WriteLine("5. Поиск товаров");//
-                Console.WriteLine("Выйти - 0");
-                
                 string menu = Console.ReadLine();
-                if (!int.TryParse(menu, out int z))
+
+                if (!int.TryParse(menu, out int choice))
                 {
                     Console.WriteLine("Нужно ввести число!");
                     continue;
                 }
-                switch (z)
+
+                switch (choice)
                 {
+                    case 1:
+                        Console.WriteLine("Введите текст:");
+
+                        string text = Console.ReadLine();
+
+                        if (text.Length < 100)
+                        {
+                            Console.WriteLine("Текст должен быть минимум 100 символов.");
+                            break;
+                        }
+                        else
+                        {
+                            TextStatistics statistics = new TextStatistics();
+                            statistics.Text = text;
+                            statistics.Print();
+                        }
+
+                        
+
+                        // тут вывести всю статистику:
+                        // количество слов
+                        // самое короткое слово
+                        // самое длинное слово
+                        // количество предложений
+                        // количество гласных
+                        // количество согласных
+                        // частоту букв
+
+                        // тут добавить statistics в Memory
+
+                        break;
+
+                    case 2:
+                        // тут показать статистику прошлых текстов
+                        break;
+
                     case 0:
                         k = false;
                         break;
-                    case 1:
-                        Console.WriteLine("-----------------------------------");
-                        Console.WriteLine("Выберите категорию нового товара:");
-                        Console.WriteLine("1. Еда"); //
-                        Console.WriteLine("2. Техника ");//
-                        Console.WriteLine("3. Быт");
-                        Console.WriteLine("4. Концелярия");
-                        bool validInput = true;
-                        while (validInput)
-                        {
-                            
-                            string categoryText = Console.ReadLine();
-                            if (!int.TryParse(categoryText, out int n))
-                            {
-                                Console.WriteLine("Категория должна быть числом!");
-                                validInput = false;
-                                continue;
-                            }
-                            
-                            switch (n)
-                            {
-                                case 1:
-                                    categoryName = CategoryName.Еда;
-                                    break;
-                                case 2:
-                                    categoryName = CategoryName.Техника;
-                                    break;
-                                case 3:
-                                    categoryName = CategoryName.Быт;
-                                    break;
-                                case 4:
-                                    categoryName = CategoryName.Концелярия;
-                                    break;
-                                default:
-                                    Console.WriteLine("Неверный выбор");
-                                    validInput = false;
-                                    continue;
-                            }
-                            Console.WriteLine("Введите  название товара");
-                            string productName = Console.ReadLine();
-                            if (productName == null)
-                            {
-                                Console.WriteLine("Название не может быть пустым!!");
-                                validInput = false;
-                                continue;
-                            }
-
-                            Console.WriteLine("Введите  цену за единицу товара");
-                            double productPrice;
-                            if (!double.TryParse(Console.ReadLine(), out productPrice))
-                            {
-                                Console.WriteLine("Цена должна быть числом дурак!");
-                                validInput = false;
-                                continue;
-                            }
-                            else if (productPrice > 0)
-                            {
-                                productPrice = Convert.ToDouble(productPrice);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Цена должна быть положительным числом гооосподи!");
-                                validInput = false;
-                                continue;
-                            }
-                            
-                            Console.WriteLine("Введите количество в наличии");
-                            int productCount;
-                            if (!int.TryParse(Console.ReadLine(), out productCount))
-                            {
-                                Console.WriteLine("Количество должно быть числом ААААА!");
-                                validInput = false;
-                                continue;
-                            }
-                            else if (productCount >= 0)
-                            {
-                                productCount = Convert.ToInt32(productCount);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Количество должно быть положительным числом БОООЖЕ!");
-                                validInput = false;
-                                continue;
-                            }
-
-                            Product h = new Product(productName, productPrice, productCount, categoryName);
-                            products.Add(h);
-                            //h добавляем в лист продукт
-                            Console.WriteLine("Добавление успешно!");
-                            Console.WriteLine("=====================================");
-                            Product.Print(products);
-                            validInput = false;
-                        }
-                        break;
-                    
-                    case 2:
-                        Console.WriteLine("Введите порядковый номер товара для удаления из списка");
-                        Product.Print(products);
-                        string number = Console.ReadLine();
-                        Product.Delete(number, products);
-                        
-                        break;
-                    
-                    case 3:
-                        Console.WriteLine("Введите ID товара для заказа поставки");
-                        Product.PrintShort(products);
-                        if (int.TryParse(Console.ReadLine(), out int Id))
-                        {
-                            if (Id > 0 )
-                            {
-                                Product.Add(Id, products);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Такого ID не существует");
-                            }
-                            
-                        }
-                        else
-                        {
-                            Console.WriteLine("Неверный ID");
-                        }
-                        
-                        break;
-                    
-                    case 4:
-                        Console.WriteLine("Введите ID товара продажи");
-                        Product.PrintShort(products);
-                        if (int.TryParse(Console.ReadLine(), out int id))
-                        {
-                            if (id > 0 )
-                            {
-                                Product.Sale(id, products);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Такого ID не существует");
-                            }
-                            
-                        }
-                        else
-                        {
-                            Console.WriteLine("Неверный ID");
-                        }
-
-
-                        break;
-                    case 5:
-                        Product.Search(products);
-
-                        break;
 
                     default:
-                        Console.WriteLine("Не верное число");
+                        Console.WriteLine("Неверный пункт меню");
                         break;
-
                 }
             }
         }
 
-        class Product
+        
+        class TextStatistics
         {
-            private static int nextID = 0;
-            
-            public  int ID ;
-            public string Name { get; set; }
+            public string Text { get; set; }
 
-            public double Price { get; set; }
 
-            public int Count { get; set; }
 
-            public bool Exist
+            public string[] Words
             {
-                get {
-                    if (Count > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                get
+                {
+                    return Text.Split(new char[] { ' ', ',', ':','-','—', '.', '!', '?'}, StringSplitOptions.RemoveEmptyEntries);
+                }
+                
+            }
+
+            public int WordCount
+            {
+                get
+                {
+                    return  Words.Length;
                 }
             }
 
-            public CategoryName Category;
-
-            public Product(string Name, double Price, int Count, CategoryName category)
-            {
-                ID = ++nextID;
-                this.Name = Name;
-                this.Price = Price;
-                this.Count = Count;
-                Category = category;
-            }
-
-            public static void Print(List<Product> products)
-            {
-                foreach (var item in products)
+            public string ShortWord {
+                get
                 {
-                    Console.WriteLine($" ID товара: {item.ID} ");
-                    Console.WriteLine($" название: {item.Name} ");
-                    Console.WriteLine($" Цена: {item.Price}₽ ");
-                    Console.WriteLine($" Остаток: {item.Count} шт. ");
-                    Console.WriteLine($" Наличие на складе: {item.Exist} ");
-                    Console.WriteLine($" Категория: {item.Category} ");
-                    Console.WriteLine("----------------------------------------");
-                }
-            }
-            
-            public static void PrintShort(List<Product> products)
-            {
-                foreach (var item in products)
-                {
-                    Console.WriteLine($" ID товара: {item.ID} ");
-                    Console.WriteLine($" название: {item.Name} ");
-                    Console.WriteLine($" Остаток: {item.Count} шт.");
-                    Console.WriteLine("----------------------------------------");
-                }
-            }
-
-            public static void Delete(string num, List<Product>products)
-            {
-                if (int.TryParse(num, out int Num))
-                {
-                    if (Num > 0  && Num <= products.Count)
+                    int min = Words[0].Length;
+                    string shorts = null;
+                    foreach (var slovo in Words)
                     {
-                        products.RemoveAt(Num-1);
-                        Console.WriteLine($" Удаление успещно!");
-                        Console.WriteLine("Новый список товаров: ");
-                        Console.WriteLine("----------------------------------------");
-                        Product.Print(products);
+                        if (slovo.Length < min)
+                        {
+                            min = slovo.Length;
+                            shorts = slovo;
+                        }
                         
                     }
-                    else if (Num > products.Count)
-                    {
-                        Console.WriteLine($" Ваше число больше чем количество товаров в скписке");
-                    }
-                    else
-                    {
-                        Console.WriteLine($" Число не может быть отрицательным РРРР!!");
-                        Console.WriteLine("----------------------------------------");
-                    }
-                    
-                }
-                else
-                {
-                    Console.WriteLine($" Напиши целое число епстудей!!");
-                    Console.WriteLine("----------------------------------------");
-                }
-                
+                    return shorts;
+                } 
             }
 
-            public static void Add(int ID, List<Product> product)
+            public string LongWord
             {
-                
-                Console.Write("Введите желаемое количество товара для поставки: ");
-                string newCount = Console.ReadLine();
-                if (int.TryParse(newCount, out int count))
+                get
                 {
-                    if (count > 0)
+                    int max = 0;
+                    string longs = null;
+                    foreach (var slovo in Words)
                     {
-                        var item = product.Find(p => p.ID == ID);
-                        if (item != null)
+                        if (slovo.Length > max)
                         {
-                            item.Count += count;
+                            max = slovo.Length;
+                            longs = slovo;
+                        }
+                        
+                    }
+                    return longs;
+                }
+            
+            }
+
+            public int VowelCount //гласные
+            {
+                get
+                {
+                    return Regex.Matches(Text, "[аеёиоуыэюяАЕЁИОУЫЭЮЯ]").Count;
+                }
+            }
+
+            public int SentenceCount
+            {
+                get
+                {
+                    string[]  sentence = Text.Split(new char[] { '.', '!', '?'}, StringSplitOptions.RemoveEmptyEntries);
+                    return  sentence.Length;
+                }
+            } //кол-во предложений
+
+            public int ConsonantCount //согласные
+            {
+                get
+                {
+                    return Regex.Matches(Text, "[бвгджзйклмнпрстфхцчшщБВГДЖЗЙКЛМНПРСТФХЦЧШЩ]").Count;
+                }
+            }
+
+            public Dictionary<char, int> Statisticword {
+                get
+                {
+                    return CountLetters();
+                }
+            }
+            
+            public Dictionary<char, int> CountLetters()
+            {
+                Dictionary<char, int> statisticWord = new Dictionary<char, int>();
+
+                foreach (char symbol in Text.ToLower())
+                {
+                    if (char.IsLetter(symbol))
+                    {
+                        if (statisticWord.ContainsKey(symbol))
+                        {
+                            statisticWord[symbol]++;
                         }
                         else
                         {
-                            Console.WriteLine($"Товар с этим ID не существует или был удален");
+                            statisticWord[symbol] = 1;
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine($" Число не может быть отрицательным РРРР!!");
-                        Console.WriteLine("----------------------------------------");
-                    }
-
-                }
-                else
-                {
-                    Console.WriteLine("Количество должно быть числом ААААА!");
-                }
-            }
-
-            public static void Sale(int ID,List<Product> product)
-            {
-                Console.Write("Введите количество продаваемого товара: ");
-                string newCount = Console.ReadLine();
-                if (int.TryParse(newCount, out int count))
-                {
-                    count = Convert.ToInt32(newCount);
-                    if (count > 0)
-                    {
-                        var item = product.Find(p => p.ID == ID);
-                        if (item != null)
-                        {
-                            if (item.Exist && count <= item.Count)
-                            {
-                                item.Count -= count;
-                                Console.WriteLine("Продажа успешна!");
-                                Console.WriteLine("Новые данные товара: ");
-                                Console.WriteLine($" ID товара: {item.ID} ");
-                                Console.WriteLine($" название: {item.Name} ");
-                                Console.WriteLine($" Остаток: {item.Count} шт.");
-                                Console.WriteLine("----------------------------------------");
-                                
-                            }
-                            else
-                            {
-                                Console.WriteLine("Недостаточно товара на складе");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Товар с этим ID не существует или был удален");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Количество должно быть положительным числом");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Количество должно быть числом ААААА!");
-                }
-            }
-
-            public static void Search(List<Product> product)
-            {
-                Console.WriteLine($"Выберете по какому критерию будем искать:");
-                Console.WriteLine("1. ID"); 
-                Console.WriteLine("2. Название");
-                Console.WriteLine("3. Категория");
-                Console.WriteLine("4. Цена");
-                string Find = Console.ReadLine();
-                if (int.TryParse(Find, out int n))
-                {
-                    n = Convert.ToInt32(Find);
-                    switch (n)
-                    {
-                        case 1:
-                            Console.WriteLine($"Введите ID");
-                            string ID = Console.ReadLine();
-                            if (int.TryParse(ID, out int id))
-                            {
-                                id  = Convert.ToInt32(ID);
-                                var item = product.Find(p => p.ID == id);
-                                if (id > 0)
-                                {
-                                    if (item != null)
-                                    {
-                                        Console.WriteLine($" ID товара: {item.ID} ");
-                                        Console.WriteLine($" название: {item.Name} ");
-                                        Console.WriteLine($" Цена: {item.Price}₽ ");
-                                        Console.WriteLine($" Остаток: {item.Count} шт. ");
-                                        Console.WriteLine($" Наличие на складе: {item.Exist} ");
-                                        Console.WriteLine($" Категория: {item.Category} ");
-                                        Console.WriteLine("----------------------------------------");
-                                    }
-                                    else 
-                                        Console.WriteLine($"Товар с этим ID не существует или был удален");
-                                    
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Товар не может быть с отрицательным ID гад демн!!"); 
-                                }
-                            }
-                            else 
-                                Console.WriteLine($"Глаза разуй, число пиши, а не ахинею свою!!"); 
-                            break;
-                        case 2:
-                            Console.Write($"Введите название товара:");
-                            string name = Console.ReadLine();
-                            var itemName = product.FindAll(p => p.Name == name);
-                            if (itemName.Count > 0)
-                            {
-                                Console.WriteLine($"Вот что нашлось по запросу: '{name}' ");
-                                Product.Print(itemName);
-                            }
-                            else 
-                                Console.WriteLine($"По запросу: '{name}' Ничего не нашлось :( ");
-                            break;
-                        case 3:
-                            Console.WriteLine("Выберите категорию:");
-                            Console.WriteLine("1. Еда");
-                            Console.WriteLine("2. Техника");
-                            Console.WriteLine("3. Быт");
-                            Console.WriteLine("4. Концелярия");
-
-                            string category = Console.ReadLine();
-
-                            if (int.TryParse(category, out int c))
-                            {
-                                CategoryName categoryName = CategoryName.Еда;
-
-                                switch (c)
-                                {
-                                    case 1:
-                                        categoryName = CategoryName.Еда;
-                                        break;
-                                    case 2:
-                                        categoryName = CategoryName.Техника;
-                                        break;
-                                    case 3:
-                                        categoryName = CategoryName.Быт;
-                                        break;
-                                    case 4:
-                                        categoryName = CategoryName.Концелярия;
-                                        break;
-                                    default:
-                                        Console.WriteLine("Такой категории нету емае!!");
-                                        return;
-                                }
-
-                                var itemCategory = product.FindAll(p => p.Category == categoryName);
-
-                                if (itemCategory.Count > 0)
-                                {
-                                    Console.WriteLine($"Вот что нашлось по категории: '{categoryName}' ");
-                                    Product.Print(itemCategory);
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"В категории: '{categoryName}' Ничего не нашлось :( ");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Это не числооо с//////аа");
-                            }
-                            break;
-                        case 4:
-                            Console.WriteLine("Введите цену товара:");
-                            string priceText = Console.ReadLine();
-
-                            if (double.TryParse(priceText, out double price))
-                            {
-                                if (price >= 0)
-                                {
-                                    var itemPrice = product.FindAll(p => p.Price == price);
-
-                                    if (itemPrice.Count > 0)
-                                    {
-                                        Console.WriteLine($"Вот что нашлось по цене: {price}₽ ");
-                                        Product.Print(itemPrice);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"По цене: {price}₽ Ничего не нашлось :( ");
-                                    }
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Цена не может быть отрицательной ну емае!!");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Цена должна быть числом ААААА!");
-                            }
-                            break;
-                        default:
-                            Console.WriteLine("Неверное число");
-                            break;
                     }
                     
                 }
-                else 
-                    Console.WriteLine("Это не чиссчкаа");
+                return statisticWord;
             }
+
+            public virtual void Print()
+            {
+                Console.WriteLine($"Количество слов: {WordCount} \n Самое короткое слово из текста: {ShortWord} \n Самое длинное слово из текста: {LongWord} \n Количество предложений: {SentenceCount} \n Количество гласных: {VowelCount} \n Количество согласных: {ConsonantCount} \n -----Встречаемость букв------");
+                foreach (var w in Statisticword)
+                {
+                    Console.WriteLine($"{w.Key} - {w.Value} раз");
+                }
+            }
+
         }
 
-        public enum CategoryName
+        class Memory
         {
-            Еда,
-            Техника,
-            Быт,
-            Концелярия
+            public List<TextStatistics> History { get; set; } = new List<TextStatistics>();
 
+            
         }
-
     }
 }
