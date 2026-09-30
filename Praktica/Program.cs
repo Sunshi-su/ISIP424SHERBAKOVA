@@ -13,10 +13,11 @@ namespace Praktica
 {
     internal class Program
     {
+        
         static void Main(string[] args)
         {
             
-            
+            Memory memory = new Memory();
             bool k = true;
             while (k)
             {
@@ -44,32 +45,18 @@ namespace Praktica
                         if (text.Length < 100)
                         {
                             Console.WriteLine("Текст должен быть минимум 100 символов.");
-                            break;
+                            continue;
                         }
-                        else
-                        {
-                            TextStatistics statistics = new TextStatistics();
-                            statistics.Text = text;
-                            statistics.Print();
-                        }
-
                         
-
-                        // тут вывести всю статистику:
-                        // количество слов
-                        // самое короткое слово
-                        // самое длинное слово
-                        // количество предложений
-                        // количество гласных
-                        // количество согласных
-                        // частоту букв
-
-                        // тут добавить statistics в Memory
+                        TextStatistics statistics = new TextStatistics();
+                        statistics.Text = text;
+                        statistics.Print();
+                        memory.Add(statistics);
 
                         break;
 
                     case 2:
-                        // тут показать статистику прошлых текстов
+                        memory.ShowText();
                         break;
 
                     case 0:
@@ -87,14 +74,12 @@ namespace Praktica
         class TextStatistics
         {
             public string Text { get; set; }
-
-
-
+            
             public string[] Words
             {
                 get
                 {
-                    return Text.Split(new char[] { ' ', ',', ':','-','—', '.', '!', '?'}, StringSplitOptions.RemoveEmptyEntries);
+                    return Text.Split(new char[] { ' ', ',', ':', ';','-','—', '.', '!', '?'}, StringSplitOptions.RemoveEmptyEntries);
                 }
                 
             }
@@ -212,9 +197,82 @@ namespace Praktica
 
         class Memory
         {
-            public List<TextStatistics> History { get; set; } = new List<TextStatistics>();
+            private Dictionary<int, TextStatistics> History { get; set; }
+                = new Dictionary<int, TextStatistics>();
 
+            private int nextID = 1;
+
+            public void Add(TextStatistics statistics)
+            {
+                History.Add(nextID, statistics);
+                nextID++;
+            }
+
+            public Dictionary<int, TextStatistics> GetHistory()
+            {
+                return History;
+            }
+
+            public TextStatistics GetStatistics(int id)
+            {
+                return History[id];
+            }
             
+            public void ShowText()
+            {
+                if (History.Count > 0)
+                {
+                    Console.WriteLine($"Введите номер текста для вывода статистика");
+                    foreach (var statistics in History)
+                    {
+                        Console.WriteLine($"{statistics.Key}.  {statistics.Value.Text.Remove(30)}...");
+                    }
+
+                    Console.WriteLine($"0. Вывести статистику по всем текстам ");
+                    string input = Console.ReadLine();
+
+                    if (!int.TryParse(input, out int choice))
+                    {
+                        Console.WriteLine("Нужно ввести число!");
+                        return;
+                    }
+
+                    PrintText(choice);
+                
+                }
+                else
+                {
+                    Console.WriteLine($"Вы еще не вводили ни один текст");
+                }
+                void PrintText(int index)
+                {
+                    if (index > History.Count)
+                    {
+                        Console.WriteLine("Такого текста нет.");
+                        return;
+                    }
+
+                    if (index == 0)
+                    {
+                        foreach (var history in History)
+                        {
+                            Console.WriteLine("------------------------------------");
+                            Console.WriteLine($"Текст номер {history.Key}:");
+                            Console.WriteLine("------------------------------------");
+                            Console.WriteLine(history.Value.Text);
+                            Console.WriteLine("Статистика:");
+                            history.Value.Print();
+                        }
+                        return;
+                    }
+
+                    Console.WriteLine("Полный текст:");
+                    Console.WriteLine(History[index].Text);
+                    Console.WriteLine("----------------------------");
+                    Console.WriteLine("Статистика:");
+                    History[index].Print();
+                }
+            }
         }
     }
 }
